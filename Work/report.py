@@ -31,26 +31,32 @@ def read_prices(filename):
                 prices[row[0]] = float(row[1])
     return prices
 
-def caculation(portfolio, prices):
+def make_report(portfolio, prices):
+    report = []
+    for p in portfolio:
+        r = (p['name'], p['shares'], prices[p['name']], prices[p['name']] - p['price'])
+        report.append(r)
+    return report
+
+def caculation(report):
     '''Caculate the current value of profolio along with gain/loss'''
     total = 0.0
     flag = ''
-    for s in portfolio:
-        result = round(s['shares'] * (prices[s['name']] - s['price']), 2)
+    for name, shares, price, change in report:
+        result = round(shares * change, 2)
         total += result
-        if result >= 0:
-            flag = 'gain'
-        else:
-            flag = 'loss'
-        print(s['name'], s['shares'], s['price'], prices[s['name']], result, flag)
     return total
 
-
 portfolio = read_portfolio('Data/portfolio.csv')
-pprint(portfolio)
-
 prices = read_prices('Data/prices.csv')
-pprint(prices)
+report = make_report(portfolio, prices)
 
-total = caculation(portfolio, prices)
+headers = ('Name', 'Shares', 'Price', 'Change')
+print('%10s %10s %10s %10s' % headers)
+print('---------- ---------- ---------- ----------')
+for name, shares, price, change in report:
+    #print('%10s %10d %$>10.2f %10.2f' % r)
+    print(f'{name:>10s} {shares:>10d} {price:>10.2f} {change:10.2f}')
+print('-------------------------------------------')
+total = caculation(report)
 print('Total: ', total)
