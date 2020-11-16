@@ -11,11 +11,12 @@ def read_portfolio(filename):
     with open(filename, 'rt') as f:
         rows = csv.reader(f)
         headers = next(rows)
-        for row in rows:
+        for rowno, row in enumerate(rows, start = 1):
+            record = dict(zip(headers, row))
             holding = {
-                    'name': row[0],
-                    'shares':int(row[1]),
-                    'price':float(row[2])
+                    'name': record['name'],
+                    'shares':int(record['shares']),
+                    'price':float(record['price'])
                     }
             portfilio.append(holding)
     return portfilio
@@ -47,7 +48,7 @@ def caculation(report):
         total += result
     return total
 
-portfolio = read_portfolio('Data/portfolio.csv')
+portfolio = read_portfolio('Data/portfoliodate.csv')
 prices = read_prices('Data/prices.csv')
 report = make_report(portfolio, prices)
 
