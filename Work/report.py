@@ -1,56 +1,31 @@
 # report.py
 #
 # Exercise 2.4
-import csv
+from fileparse import parse_csv
 from pprint import pprint
 
 def read_portfolio(filename):
     '''Read portfolio file into a list of dict'''
-    portfilio = []
-
-    with open(filename, 'rt') as f:
-        rows = csv.reader(f)
-        headers = next(rows)
-        for rowno, row in enumerate(rows, start = 1):
-            record = dict(zip(headers, row))
-            holding = {
-                    'name': record['name'],
-                    'shares':int(record['shares']),
-                    'price':float(record['price'])
-                    }
-            portfilio.append(holding)
-    return portfilio
+    return parse_csv(filename, select=['name','shares','price'], types=[str,int,float])
 
 def read_prices(filename):
     '''Read prices file into a dict'''
-    prices = {}
+    prices = parse_csv(filename, types=[str,float], has_headers=False)
+    return dict(prices)
 
-    with open(filename, 'rt') as f:
-        rows = csv.reader(f)
-        for row in rows:
-            if len(row) != 0:
-                prices[row[0]] = float(row[1])
-    return prices
-
-def make_report(portfolio, prices):
+def make_report(portfolio):
+    '''
+    Make a report
+    '''
     report = []
+    prices = read_prices('Data/prices.csv')
     for p in portfolio:
         r = (p['name'], p['shares'], prices[p['name']], prices[p['name']] - p['price'])
         report.append(r)
     return report
 
-def caculation(report):
-    '''Caculate the current value of profolio along with gain/loss'''
-    total = 0.0
-    flag = ''
-    for name, shares, price, change in report:
-        result = round(shares * change, 2)
-        total += result
-    return total
-
 portfolio = read_portfolio('Data/portfoliodate.csv')
-prices = read_prices('Data/prices.csv')
-report = make_report(portfolio, prices)
+report = make_report(portfolio)
 
 headers = ('Name', 'Shares', 'Price', 'Change')
 print('%10s %10s %10s %10s' % headers)
@@ -58,6 +33,4 @@ print('---------- ---------- ---------- ----------')
 for name, shares, price, change in report:
     #print('%10s %10d %$>10.2f %10.2f' % r)
     print(f'{name:>10s} {shares:>10d} {price:>10.2f} {change:10.2f}')
-print('-------------------------------------------')
-total = caculation(report)
-print('Total: ', total)
+
