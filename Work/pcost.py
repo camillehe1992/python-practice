@@ -9,3 +9,13 @@ def portfolio_cost(filename):
     for p in portfolio:
         cost += round(p['shares'] * p['price'], 2)
     return cost
+
+def main(argv):
+    if len(argv) != 2:
+        raise SystemExit('filename must be provided')
+    cost = portfolio_cost(argv[1])
+    print(f'Total cost: {cost}')
+
+if __name__ == '__main__':
+    import sys
+    main(sys.argv)
